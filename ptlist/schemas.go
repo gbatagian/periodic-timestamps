@@ -1,7 +1,6 @@
 package ptlist
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 
@@ -15,27 +14,26 @@ type queryParams struct {
 	t2     string
 }
 
-func (p *queryParams) validate(c *gin.Context) bool {
-	return (p.validateParametersAreNotMissing(c) &&
-		p.validateTimestampsHaveSpecifiedFormat(c) &&
-		p.validatePeriod())
+func (qp *queryParams) validate(c *gin.Context) bool {
+	return (qp.validateParametersAreNotMissing(c) &&
+		qp.validateTimestampsHaveSpecifiedFormat(c) &&
+		qp.validatePeriod(c))
 }
 
-func (p *queryParams) validateParametersAreNotMissing(c *gin.Context) bool {
+func (qp *queryParams) validateParametersAreNotMissing(c *gin.Context) bool {
 	paramsMap := map[string]string{
-		"period": p.period,
-		"tz":     p.tz,
-		"t1":     p.t1,
-		"t2":     p.t2,
+		"period": qp.period,
+		"tz":     qp.tz,
+		"t1":     qp.t1,
+		"t2":     qp.t2,
 	}
 	for k, v := range paramsMap {
 		if v == "" {
 			c.JSON(
 				http.StatusBadRequest,
 				gin.H{
-					"error": fmt.Sprintf(
-						"The '%s' parameter cannot be empty. Please provide a value for this parameter.", k,
-					),
+					"status": "error",
+					"desc":   emptyQueryParameter{name: k}.Error(),
 				},
 			)
 			return false
@@ -44,17 +42,16 @@ func (p *queryParams) validateParametersAreNotMissing(c *gin.Context) bool {
 	return true
 }
 
-func (p *queryParams) validateTimestampsHaveSpecifiedFormat(c *gin.Context) bool {
+func (qp *queryParams) validateTimestampsHaveSpecifiedFormat(c *gin.Context) bool {
 	pattern := `^\d{8}T\d{6}Z$`
 	r := regexp.MustCompile(pattern)
-	for _, t := range []string{p.t1, p.t2} {
+	for _, t := range []string{qp.t1, qp.t2} {
 		if !r.MatchString(t) {
 			c.JSON(
 				http.StatusBadRequest,
 				gin.H{
-					"error": fmt.Sprintf(
-						"Timestamp '%s' does not match the required format, YYYYDDMMTHHMMSSZ", t,
-					),
+					"status": "error",
+					"desc":   invalidTimestampFormat{timestamp: t}.Error(),
 				},
 			)
 			return false
@@ -63,8 +60,15 @@ func (p *queryParams) validateTimestampsHaveSpecifiedFormat(c *gin.Context) bool
 	return true
 }
 
-func (p *queryParams) validatePeriod() bool {
-	p.period = PeriodFromString(p.period).String()
+func (qp *queryParams) validatePeriod(c *gin.Context) bool {
+	_, err := PeriodFromString(qp.period)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"desc":   err.Error(),
+		})
+		return false
+	}
 	return true
 }
 
@@ -75,7 +79,8 @@ func (p *queryParams) fromRequestContext(c *gin.Context) bool {
 			c.JSON(
 				http.StatusBadRequest,
 				gin.H{
-					"error": r,
+					"status": "error",
+					"desc":   r,
 				},
 			)
 		}

@@ -37,7 +37,10 @@ func TestPeriodFromStringOK(t *testing.T) {
 	for idx, ps := range []string{
 		"1h", "1d", "1m", "1y",
 	} {
-		v := PeriodFromString(ps)
+		v, err := PeriodFromString(ps)
+		if err != nil {
+			t.Errorf("Unsupported period: %s", v)
+		}
 		if v != expectedValues[idx] {
 			t.Errorf("Unexpected value %d for string %s", v, ps)
 		}
@@ -46,11 +49,8 @@ func TestPeriodFromStringOK(t *testing.T) {
 }
 
 func TestPeriodFromStringInvalidValue(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The function did not panic as expected")
-		}
-	}()
-
-	PeriodFromString("aaa")
+	_, err := PeriodFromString("aaa")
+	if err == nil {
+		t.Errorf("unsupportedPeriodError not raise")
+	}
 }

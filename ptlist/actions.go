@@ -5,7 +5,7 @@ import (
 )
 
 func PeriodicTimestamps(period string, timeString1 string, timeString2 string) []time.Time {
-	p := PeriodFromString(period)
+	p, _ := PeriodFromString(period)
 	layout := "20060102T150405Z"
 
 	t1, _ := time.Parse(layout, timeString1)

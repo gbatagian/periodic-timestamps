@@ -9,6 +9,7 @@ const (
 	Daily
 	Monthly
 	Yearly
+	UnknownPeriod
 )
 
 func (p Period) String() string {
@@ -25,7 +26,7 @@ func (p Period) String() string {
 	return names[p]
 }
 
-func PeriodFromString(s string) Period {
+func PeriodFromString(s string) (Period, error) {
 	periodsMap := map[string]Period{
 		"1h": Hourly,
 		"1d": Daily,
@@ -34,11 +35,7 @@ func PeriodFromString(s string) Period {
 	}
 	period, ok := periodsMap[s]
 	if !ok {
-		panic(
-			fmt.Sprintf(
-				"Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1d, 1m, 1y]", s,
-			),
-		)
+		return UnknownPeriod, unsupportedPeriodError{}
 	}
-	return period
+	return period, nil
 }

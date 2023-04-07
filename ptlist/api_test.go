@@ -61,9 +61,10 @@ func Test400ParameterMissing(t *testing.T) {
 			t.Errorf("Response status code is not 400. Status code: %d", status)
 		}
 		if body := resp.Body.String(); body != utils.ToJsonString(map[string]interface{}{
-			"error": fmt.Sprintf("The '%s' parameter cannot be empty. Please provide a value for this parameter.", k),
+			"status": "error",
+			"desc":   fmt.Sprintf("The '%s' parameter cannot be empty. Please provide a value for this parameter.", k),
 		}) {
-			t.Errorf("Response payload has invalid format. Expected: %s", body)
+			t.Errorf("Response payload has invalid format. Body: %s", body)
 		}
 
 		paramValues[k] = paramValueBackUp
@@ -88,9 +89,10 @@ func Test400InvalidPeriodValue(t *testing.T) {
 		t.Errorf("Response status code is not 400. Status code: %d", status)
 	}
 	if body := resp.Body.String(); body != utils.ToJsonString(map[string]interface{}{
-		"error": fmt.Sprintf("Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1d, 1m, 1y]", invalidPeriodValue),
+		"desc":   "Unsupported period",
+		"status": "error",
 	}) {
-		t.Errorf("Response payload has invalid format. Expected: %s", body)
+		t.Errorf("Response payload has invalid format. Body: %s", body)
 	}
 
 }
@@ -113,9 +115,10 @@ func Test400InvalidDateTimeFormat(t *testing.T) {
 		t.Errorf("Response status code is not 400")
 	}
 	if body := resp.Body.String(); body != utils.ToJsonString(map[string]interface{}{
-		"error": fmt.Sprintf("Timestamp '%s' does not match the required format, YYYYDDMMTHHMMSSZ", invalidDateTime),
+		"status": "error",
+		"desc":   fmt.Sprintf("Timestamp '%s' does not match the required format YYYYDDMMTHHMMSSZ", invalidDateTime),
 	}) {
-		t.Errorf("Response payload has invalid format. Expected: %s", body)
+		t.Errorf("Response payload has invalid format. Body: %s", body)
 	}
 
 }
