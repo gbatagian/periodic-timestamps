@@ -122,3 +122,29 @@ func Test400InvalidDateTimeFormat(t *testing.T) {
 	}
 
 }
+
+func Test400InvalidTimezone(t *testing.T) {
+	// Arrange
+	unknownTimeZone := "foo"
+	URL := baseURL + fmt.Sprintf("?period=1h&tz=%s&t1=20210714T204603Z&t2=20210715T123456Z", unknownTimeZone)
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp := httptest.NewRecorder()
+
+	// Act
+	testRouter.ServeHTTP(resp, req)
+
+	// Assert
+	if status := resp.Code; status != http.StatusBadRequest {
+		t.Errorf("Response status code is not 400")
+	}
+	if body := resp.Body.String(); body != utils.ToJsonString(map[string]interface{}{
+		"status": "error",
+		"desc":   fmt.Sprintf("unknown time zone %s", unknownTimeZone),
+	}) {
+		t.Errorf("Response payload has invalid format. Body: %s", body)
+	}
+
+}

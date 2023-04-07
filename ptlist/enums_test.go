@@ -35,7 +35,7 @@ func TestPeriodFromStringOK(t *testing.T) {
 		Yearly,
 	}
 	for idx, ps := range []string{
-		"1h", "1d", "1m", "1y",
+		"1h", "1d", "1mo", "1y",
 	} {
 		v, err := PeriodFromString(ps)
 		if err != nil {
