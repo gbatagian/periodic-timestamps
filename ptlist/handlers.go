@@ -13,11 +13,6 @@ func PtListGet() gin.HandlerFunc {
 		if !ok {
 			return
 		}
-		c.JSON(http.StatusOK, map[string]string{
-			"period": params.period,
-			"tz":     params.tz,
-			"t1":     params.t1,
-			"t2":     params.t2,
-		})
+		c.JSON(http.StatusOK, PeriodicTimestamps(params.period, params.t1, params.t2))
 	}
 }

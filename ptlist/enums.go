@@ -7,14 +7,13 @@ type Period int
 const (
 	Hourly Period = iota
 	Daily
-	Weekly
 	Monthly
 	Yearly
 )
 
 func (p Period) String() string {
 	names := []string{
-		"1h", "1d", "1w", "1m", "1y",
+		"1h", "1d", "1m", "1y",
 	}
 	if p < Hourly || p > Yearly {
 		panic(
@@ -30,7 +29,6 @@ func PeriodFromString(s string) Period {
 	periodsMap := map[string]Period{
 		"1h": Hourly,
 		"1d": Daily,
-		"1w": Weekly,
 		"1m": Monthly,
 		"1y": Yearly,
 	}
@@ -38,7 +36,7 @@ func PeriodFromString(s string) Period {
 	if !ok {
 		panic(
 			fmt.Sprintf(
-				"Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1w, 1d, 1m, 1y]", s,
+				"Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1d, 1m, 1y]", s,
 			),
 		)
 	}

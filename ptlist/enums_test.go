@@ -1,12 +1,13 @@
 package ptlist
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPeriodStringOK(t *testing.T) {
 	values := []Period{
 		Hourly,
 		Daily,
-		Weekly,
 		Monthly,
 		Yearly,
 	}
@@ -30,12 +31,11 @@ func TestPeriodFromStringOK(t *testing.T) {
 	expectedValues := []Period{
 		Hourly,
 		Daily,
-		Weekly,
 		Monthly,
 		Yearly,
 	}
 	for idx, ps := range []string{
-		"1h", "1d", "1w", "1m", "1y",
+		"1h", "1d", "1m", "1y",
 	} {
 		v := PeriodFromString(ps)
 		if v != expectedValues[idx] {

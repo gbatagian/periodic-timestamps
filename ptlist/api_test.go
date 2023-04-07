@@ -88,7 +88,7 @@ func Test400InvalidPeriodValue(t *testing.T) {
 		t.Errorf("Response status code is not 400. Status code: %d", status)
 	}
 	if body := resp.Body.String(); body != utils.ToJsonString(map[string]interface{}{
-		"error": fmt.Sprintf("Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1w, 1d, 1m, 1y]", invalidPeriodValue),
+		"error": fmt.Sprintf("Invalid value '%s' provided as period. Please provide one of the supported values: [1h, 1d, 1m, 1y]", invalidPeriodValue),
 	}) {
 		t.Errorf("Response payload has invalid format. Expected: %s", body)
 	}
