@@ -126,10 +126,10 @@ type ptListGetResponse struct {
 }
 
 func (r *ptListGetResponse) fromTimestampsSlice(tms []time.Time) {
-	var stringTms []string
+	var strTmsSlice []string
 	for _, t := range tms {
-		stringTms = append(stringTms, t.Format(settings.DatesLayout))
+		strTmsSlice = append(strTmsSlice, t.Format(settings.DatesLayout))
 	}
 
-	r.ptlist = stringTms
+	r.ptlist = strTmsSlice
 }
