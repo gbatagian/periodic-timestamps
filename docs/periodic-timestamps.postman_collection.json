@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "fdacb0ba-8427-4472-aa65-faa5fd233e7a",
+		"name": "powerfactors",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/healthcheck",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"healthcheck"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Missing parameters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Invalid Period",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist?period=1w&tz=Europe/Athens&t1=20180214T204603Z&t2=20211115T123456Z",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "1w"
+						},
+						{
+							"key": "tz",
+							"value": "Europe/Athens"
+						},
+						{
+							"key": "t1",
+							"value": "20180214T204603Z"
+						},
+						{
+							"key": "t2",
+							"value": "20211115T123456Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Hourly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist?period=1h&tz=Europe/Athens&t1=20210714T204603Z&t2=20210715T123456Z",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "1h"
+						},
+						{
+							"key": "tz",
+							"value": "Europe/Athens"
+						},
+						{
+							"key": "t1",
+							"value": "20210714T204603Z"
+						},
+						{
+							"key": "t2",
+							"value": "20210715T123456Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Dailly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist?period=1d&tz=Europe/Athens&t1=20211010T204603Z&t2=20211115T123456Z",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "1d"
+						},
+						{
+							"key": "tz",
+							"value": "Europe/Athens"
+						},
+						{
+							"key": "t1",
+							"value": "20211010T204603Z"
+						},
+						{
+							"key": "t2",
+							"value": "20211115T123456Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Montly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist?period=1mo&tz=Europe/Athens&t1=20210214T204603Z&t2=20211115T123456Z",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "1mo"
+						},
+						{
+							"key": "tz",
+							"value": "Europe/Athens"
+						},
+						{
+							"key": "t1",
+							"value": "20210214T204603Z"
+						},
+						{
+							"key": "t2",
+							"value": "20211115T123456Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ptlist - Yearly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/ptlist?period=1y&tz=Europe/Athens&t1=20180214T204603Z&t2=20211115T123456Z",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"ptlist"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "1y"
+						},
+						{
+							"key": "tz",
+							"value": "Europe/Athens"
+						},
+						{
+							"key": "t1",
+							"value": "20180214T204603Z"
+						},
+						{
+							"key": "t2",
+							"value": "20211115T123456Z"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -20,14 +20,14 @@ func invocationTimestamp(p Period, t time.Time) time.Time {
 		return t
 	}
 
-	invocationTms := map[Period]time.Time{
+	invocationTime := map[Period]time.Time{
 		Yearly:  time.Date(year, time.December, 31, hour, 0, 0, 0, t.Location()),
 		Monthly: toMonthlyInvocationTimestamp(t),
 		Daily:   time.Date(year, month, day, hour, 0, 0, 0, t.Location()),
 		Hourly:  time.Date(year, month, day, hour, 0, 0, 0, t.Location()),
 	}
 
-	if sp, ok := invocationTms[p]; ok {
+	if sp, ok := invocationTime[p]; ok {
 		if minute > 0 || p == Hourly {
 			sp = sp.Add(time.Hour)
 		}
