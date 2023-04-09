@@ -1,16 +1,31 @@
 version: "3.7"
 
+networks:
+  apinetwork:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${DOCKER_SUBNET:-172.30.0.0/16}
+          gateway: ${DOCKER_GATEWAY:-172.30.0.1}
+
 services:
   api:
     image: golang:1.18.2-bullseye
     build: .
+    environment:
+      - API_HOST=${API_HOST:-0.0.0.0}
+      - API_PORT=${API_PORT:-8080}
+      - GIN_MODE=${GIN_MODE:-debug}
     volumes:
       - .:/app/go_service
       - go_environment:/go
     working_dir: /app/go_service
     command: bash -c "go mod download && go run ."
     ports: 
-      - 8080:8080
+      - ${API_PORT:-8080}:${API_PORT:-8080}
+    networks:
+      apinetwork:
+        ipv4_address: ${API_HOST:-172.30.0.2}
 
 volumes:
   go_environment:
