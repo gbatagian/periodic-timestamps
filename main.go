@@ -2,43 +2,44 @@ package main
 
 import (
 	"flag"
-	"os"
-	"periodic-timestamps/app"
+	"fmt"
+	"log"
+	"net/http"
+	"periodic-timestamps/ptlist"
 	"periodic-timestamps/settings"
 )
 
 type flagInputs struct {
-	host string
-	port string
-}
-
-func (f flagInputs) flagsEnvVarsMap() map[string]string {
-	return map[string]string{
-		settings.ApiHostEnvVarName: f.host,
-		settings.ApiPortEnvVarName: f.port,
-	}
+	host *string
+	port *string
 }
 
 func getFlags() flagInputs {
-	host := flag.String("host", "0.0.0.0", "Host address where the service will run. Default: 0.0.0.0")
-	port := flag.String("port", "8080", "Port number on which the service will be exposed. Default: 8080")
+	host := flag.String("host", settings.DefaultHost, fmt.Sprintf("Server host address, default: %s", settings.DefaultHost))
+	port := flag.String("port", settings.DefaultPort, fmt.Sprintf("Server listening port, default: %s", settings.DefaultPort))
 	flag.Parse()
 	return flagInputs{
-		host: *host,
-		port: *port,
-	}
-}
-
-func setEnvVarsIfNotSet(envVarsMap map[string]string) {
-	for name, value := range envVarsMap {
-		if os.Getenv(name) == "" {
-			os.Setenv(name, value)
-		}
+		host: host,
+		port: port,
 	}
 }
 
 func main() {
+	router := http.NewServeMux()
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+	router.HandleFunc("GET /ptlist", ptlist.PtListGet())
+
 	flags := getFlags()
-	setEnvVarsIfNotSet(flags.flagsEnvVarsMap())
-	app.RunWithEngine(settings.ENGINE)
+	server := http.Server{
+		Addr:    fmt.Sprintf("%s:%s", *flags.host, *flags.port),
+		Handler: router,
+	}
+
+	log.Printf("Server starts listening at: %s", server.Addr)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }

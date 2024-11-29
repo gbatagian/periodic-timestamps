@@ -4,15 +4,24 @@ import (
 	"testing"
 )
 
-func TestPeriodStringOK(t *testing.T) {
-	values := []Period{
-		Hourly,
-		Daily,
-		Monthly,
-		Yearly,
+func TestStringFromPeriodOK(t *testing.T) {
+	testCases := []struct {
+		period   Period
+		expected string
+	}{
+		{Hourly, "1h"},
+		{Daily, "1d"},
+		{Monthly, "1mo"},
+		{Yearly, "1y"},
 	}
-	for _, v := range values {
-		Period.String(v)
+
+	for _, tc := range testCases {
+		t.Run(tc.expected, func(t *testing.T) {
+			result := tc.period.String()
+			if result != tc.expected {
+				t.Errorf("String() for %v: expected %q, got %q", tc.period, tc.expected, result)
+			}
+		})
 	}
 }
 
@@ -22,26 +31,30 @@ func TestPeriodStringInvalidValue(t *testing.T) {
 			t.Errorf("The function did not panic as expected")
 		}
 	}()
-	Period.String(5)
+	_ = Period.String(5)
 }
 
 func TestPeriodFromStringOK(t *testing.T) {
-	expectedValues := []Period{
-		Hourly,
-		Daily,
-		Monthly,
-		Yearly,
+	testCases := []struct {
+		inStr    string
+		expected Period
+	}{
+		{"1h", Hourly},
+		{"1d", Daily},
+		{"1mo", Monthly},
+		{"1y", Yearly},
 	}
-	for idx, ps := range []string{
-		"1h", "1d", "1mo", "1y",
-	} {
-		v, err := PeriodFromString(ps)
-		if err != nil {
-			t.Errorf("Unsupported period: %s", v)
-		}
-		if v != expectedValues[idx] {
-			t.Errorf("Unexpected value %d for string %s", v, ps)
-		}
+
+	for _, tc := range testCases {
+		t.Run(tc.inStr, func(t *testing.T) {
+			result, err := PeriodFromString(tc.inStr)
+			if err != nil {
+				t.Errorf("Unsupported period: %s", result)
+			}
+			if result != tc.expected {
+				t.Errorf("Unexpected value %d for string %s", result, tc.inStr)
+			}
+		})
 	}
 }
 

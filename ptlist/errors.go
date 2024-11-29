@@ -2,10 +2,12 @@ package ptlist
 
 import "fmt"
 
-type unsupportedPeriodError struct{}
+type unsupportedPeriodError struct {
+	value string
+}
 
 func (e unsupportedPeriodError) Error() string {
-	return "Unsupported period"
+	return fmt.Sprintf("unsupported period '%s'", e.value)
 }
 
 type invalidTimestampFormat struct {
@@ -18,7 +20,7 @@ func (e invalidTimestampFormat) Error() string {
 		e.format = "YYYYDDMMTHHMMSSZ"
 	}
 	return fmt.Sprintf(
-		"Timestamp '%s' does not match the required format %s", e.timestamp, e.format,
+		"timestamp '%s' does not match the required format %s", e.timestamp, e.format,
 	)
 }
 
@@ -28,6 +30,6 @@ type emptyQueryParameter struct {
 
 func (e emptyQueryParameter) Error() string {
 	return fmt.Sprintf(
-		"The '%s' parameter cannot be empty. Please provide a value for this parameter.", e.name,
+		"parameter '%s' cannot be empty, please provide a value", e.name,
 	)
 }

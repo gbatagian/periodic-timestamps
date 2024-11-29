@@ -1,135 +1,114 @@
 package ptlist
 
 import (
-	"net/http"
-	"periodic-timestamps/settings"
+	"net/url"
 	"regexp"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"periodic-timestamps/settings"
 )
 
-type queryParams struct {
-	period  Period
-	tz      *time.Location
-	t1      time.Time
-	t2      time.Time
-	sPeriod string
-	sTz     string
-	sT1     string
-	sT2     string
+type QueryParams struct {
+	Period Period
+	Tz     *time.Location
+	T1     time.Time
+	T2     time.Time
+
+	rawParams url.Values
 }
 
-func (qp *queryParams) validate(c *gin.Context) bool {
-	return (qp.validateParametersAreNotMissing(c) &&
-		qp.validateTimestampsHaveSpecifiedFormat(c) &&
-		qp.validatePeriod(c) &&
-		qp.validateTimeZone(c))
-}
+func (qp *QueryParams) ParseURL(url *url.URL) (*QueryParams, error) {
+	qp.rawParams = url.Query()
 
-func (qp *queryParams) validateParametersAreNotMissing(c *gin.Context) bool {
-	paramsMap := map[string]string{
-		"period": qp.sPeriod,
-		"tz":     qp.sTz,
-		"t1":     qp.sT1,
-		"t2":     qp.sT2,
+	if err := qp.parsePeriod(); err != nil {
+		return nil, err
 	}
-	for k, v := range paramsMap {
-		if v == "" {
-			c.JSON(
-				http.StatusBadRequest,
-				gin.H{
-					"status": "error",
-					"desc":   emptyQueryParameter{name: k}.Error(),
-				},
-			)
-			return false
+	if err := qp.parseLocation(); err != nil {
+		return nil, err
+	}
+	if err := qp.parseTimestamps(); err != nil {
+		return nil, err
+	}
+
+	return qp, nil
+}
+
+func (qp *QueryParams) validateNotEmpty(name string) (string, error) {
+	value := qp.rawParams.Get(name)
+
+	if value == "" {
+		return value, emptyQueryParameter{name: name}
+	}
+
+	return value, nil
+}
+
+func (qp *QueryParams) parsePeriod() error {
+	value, err := qp.validateNotEmpty("period")
+	if err != nil {
+		return err
+	}
+
+	p, err := PeriodFromString(value)
+	qp.Period = p
+
+	return err
+}
+
+func (qp *QueryParams) parseLocation() error {
+	value, err := qp.validateNotEmpty("tz")
+	if err != nil {
+		return err
+	}
+
+	tz, err := time.LoadLocation(value)
+	qp.Tz = tz
+
+	return err
+}
+
+func (qp *QueryParams) parseTimestamps() error {
+	timestampAttrs := []string{"t1", "t2"}
+	for _, name := range timestampAttrs {
+		value, err := qp.validateNotEmpty(name)
+		if err != nil {
+			return err
+		}
+
+		pattern := `^\d{8}T\d{6}Z$`
+		r := regexp.MustCompile(pattern)
+		if !r.MatchString(value) {
+			return invalidTimestampFormat{timestamp: value}
 		}
 	}
-	return true
-}
 
-func (qp *queryParams) validateTimestampsHaveSpecifiedFormat(c *gin.Context) bool {
-	pattern := `^\d{8}T\d{6}Z$`
-	r := regexp.MustCompile(pattern)
-	for _, t := range []string{qp.sT1, qp.sT2} {
-		if !r.MatchString(t) {
-			c.JSON(
-				http.StatusBadRequest,
-				gin.H{
-					"status": "error",
-					"desc":   invalidTimestampFormat{timestamp: t}.Error(),
-				},
-			)
-			return false
-		}
-	}
 	layout := settings.DatesLayout
 
-	qp.t1, _ = time.Parse(layout, qp.sT1)
-	qp.t2, _ = time.Parse(layout, qp.sT2)
-	return true
-}
-
-func (qp *queryParams) validatePeriod(c *gin.Context) bool {
-	p, err := PeriodFromString(qp.sPeriod)
+	t1, err := time.Parse(layout, qp.rawParams.Get("t1"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "error",
-			"desc":   err.Error(),
-		})
-		return false
+		return err
 	}
-	qp.period = p
-	return true
-}
-
-func (qp *queryParams) validateTimeZone(c *gin.Context) bool {
-	tz, err := time.LoadLocation(qp.sTz)
+	t2, err := time.Parse(layout, qp.rawParams.Get("t2"))
 	if err != nil {
-		c.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"status": "error",
-				"desc":   err.Error(),
-			},
-		)
-		return false
+		return err
 	}
-	qp.tz = tz
-	return true
+
+	qp.T1 = t1
+	qp.T2 = t2
+
+	return nil
 }
 
-func (qp *queryParams) fromRequestContext(c *gin.Context) bool {
-	defer func() {
-		// All unknown errors while parsing the URL query parameters we result in 400
-		if r := recover(); r != nil {
-			c.JSON(
-				http.StatusBadRequest,
-				gin.H{
-					"status": "error",
-					"desc":   r,
-				},
-			)
-		}
-	}()
-
-	qp.sPeriod = c.Query("period")
-	qp.sTz = c.Query("tz")
-	qp.sT1 = c.Query("t1")
-	qp.sT2 = c.Query("t2")
-	return qp.validate(c)
+type PtListGetResponse struct {
+	Ptlist []string `json:"ptlist"`
 }
 
-type ptListGetResponse struct {
-	ptlist []string
-}
-
-func (r *ptListGetResponse) fromTimestampsSlice(tms []time.Time) {
+func (r *PtListGetResponse) FromTimestampsSlice(tms []time.Time) *PtListGetResponse {
 	var strTmsSlice []string
 	for _, t := range tms {
 		strTmsSlice = append(strTmsSlice, t.Format(settings.DatesLayout))
 	}
 
-	r.ptlist = strTmsSlice
+	r.Ptlist = strTmsSlice
+	return r
 }

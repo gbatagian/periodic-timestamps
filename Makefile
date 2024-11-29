@@ -7,5 +7,5 @@ test:
 coverage:
 	go test -count=1 -cover ./...
 
-coverage_profile:
+coverage-profile:
 	go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out  
