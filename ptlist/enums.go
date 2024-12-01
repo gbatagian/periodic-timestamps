@@ -35,7 +35,7 @@ func PeriodFromString(s string) (Period, error) {
 	}
 	period, ok := periodsMap[s]
 	if !ok {
-		return UnknownPeriod, unsupportedPeriodError{}
+		return UnknownPeriod, unsupportedPeriodError{value: s}
 	}
 	return period, nil
 }

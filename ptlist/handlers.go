@@ -1,22 +1,38 @@
 package ptlist
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-func PtListGet() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// De-serialize request
-		params := &queryParams{}
-		ok := params.fromRequestContext(c)
-		if !ok {
+func PtListGet() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			// Map unknown errors to 400
+			if r := recover(); r != nil {
+				http.Error(w, fmt.Sprintf("%v", r), http.StatusBadRequest)
+				log.Printf("Recovered from panic: %v", r)
+			}
+		}()
+
+		params, err := (&QueryParams{}).ParseURL(r.URL)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		// Serialize response
-		r := &ptListGetResponse{}
-		r.fromTimestampsSlice(PeriodicTimestamps(params.period, params.t1, params.t2, params.tz))
-		c.JSON(http.StatusOK, r.ptlist)
+
+		timestamps := PeriodicTimestamps(
+			params.Period,
+			params.T1,
+			params.T2,
+			params.Tz,
+		)
+
+		response := (&PtListGetResponse{}).FromTimestampsSlice(timestamps)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response.Ptlist)
 	}
 }

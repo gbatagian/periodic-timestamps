@@ -1,24 +1,25 @@
 {
 	"info": {
-		"_postman_id": "fdacb0ba-8427-4472-aa65-faa5fd233e7a",
-		"name": "powerfactors",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "3d238db4-860d-48c2-88b1-05c6a6652cec",
+		"name": "ptlist",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38874256"
 	},
 	"item": [
 		{
-			"name": "/healthcheck",
+			"name": "/health",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{scheme}}://{{host}}:{{port}}/healthcheck",
+					"raw": "{{scheme}}://{{host}}:{{port}}/health",
 					"protocol": "{{scheme}}",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
-						"healthcheck"
+						"health"
 					]
 				}
 			},

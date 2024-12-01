@@ -162,7 +162,7 @@ func TestPeriodicTimestampsHourlyStartOnWholeTime(t *testing.T) {
 	// Act
 	ptList := PeriodicTimestamps(
 		Hourly,
-		time.Date(2023, 3, 11, 11, 00, 00, 0, time.UTC),
+		time.Date(2023, 3, 11, 11, 0, 0, 0, time.UTC),
 		time.Date(2023, 3, 11, 21, 21, 21, 0, time.UTC),
 		time.UTC,
 	)
@@ -198,8 +198,8 @@ func TestPeriodicTimestampsHourlyEndOnWholeTime(t *testing.T) {
 	// Act
 	ptList := PeriodicTimestamps(
 		Hourly,
-		time.Date(2023, 3, 11, 11, 00, 00, 0, time.UTC),
-		time.Date(2023, 3, 11, 21, 00, 00, 0, time.UTC),
+		time.Date(2023, 3, 11, 11, 0, 0, 0, time.UTC),
+		time.Date(2023, 3, 11, 21, 0, 0, 0, time.UTC),
 		time.UTC,
 	)
 
